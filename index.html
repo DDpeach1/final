@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>2025热门网页游戏推荐</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        /* 基础样式 - 重点修改body背景 */
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            /* 新增背景图 + 渐变遮罩 */
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('img/111.jpg') no-repeat center center fixed;
+            background-size: cover; /* 背景图全屏覆盖 */
+            color: white;
+            opacity: 0; 
+            transition: opacity 0.8s ease; 
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: white;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            text-shadow: 0 0 10px rgba(52, 152, 219, 0.7); /* 标题文字发光效果 */
+        }
+        
+        /* 星级评分系统 */
+        .rating {
+            color: #ddd;
+            font-size: 20px;
+            margin-top: 10px;
+        }
+        .star {
+            cursor: pointer;
+            transition: color 0.2s;
+            display: inline-block;
+        }
+        .star.highlighted {
+            color: gold;
+            animation: pulse 0.3s;
+        }
+        .star:hover {
+            color: gold;
+            transform: scale(1.1);
+        }
+        
+        /* 分类筛选器 */
+        .category-filter {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .filter-btn:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+        .filter-btn.active {
+            background: #2980b9;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.8);
+        }
+        
+        /* 游戏卡片 */
+        .game-card {
+            background: rgba(26, 26, 26, 0.9); /* 卡片背景半透明，透出背景图 */
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+            margin-bottom: 20px;
+            padding: 20px;
+            display: flex;
+            transition: transform 0.3s, box-shadow 0.3s;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        .game-card.show {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(52, 152, 219, 0.4);
+        }
+        .game-logo {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #3498db, #1a1a1a);
+            border-radius: 8px;
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            border: 2px solid #3498db;
+            transition: transform 0.3s;
+        }
+        .game-card:hover .game-logo {
+            transform: rotate(5deg);
+        }
+        .game-info h3 {
+            color: white;
+            margin: 0 0 10px;
+            font-size: 1.2em;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        .game-info p {
+            color: #cccccc;
+            line-height: 1.6;
+            margin: 8px 0;
+        }
+        .highlight {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        
+        /* 详情页扩展 */
+        .official-link, .detail-btn {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 10px;
+            transition: background 0.3s, transform 0.2s;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .official-link:hover, .detail-btn:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+        
+        /* 搜索框样式 */
+        .search-container {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+        #search-input {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #3498db;
+            border-radius: 5px 0 0 5px;
+            background: rgba(26, 26, 26, 0.8);
+            color: white;
+            transition: box-shadow 0.3s;
+        }
+        #search-input:focus {
+            outline: none;
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.8);
+        }
+        #search-button {
+            padding: 10px 20px;
+            background: #3498db;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        #search-button:hover {
+            background: #2980b9;
+        }
+        
+        /* 详情弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal.show {
+            opacity: 1;
+        }
+        .modal-content {
+            background: rgba(26, 26, 26, 0.95);
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #3498db;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .close-modal:hover {
+            color: #ff6b6b;
+            transform: rotate(90deg);
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        /* 响应式优化 */
+        @media (max-width: 768px) {
+            .game-card {
+                flex-direction: column;
+            }
+            .game-logo {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            .search-container {
+                flex-direction: column;
+            }
+            #search-input {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .category-filter {
+                flex-wrap: wrap;
+            }
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+        }
+        
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3498db;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>2025热门Web游戏推荐</h1>
+        <p>精选高人气福利向页游与经典IP创新作品</p>
+    </div>
+    
+    <!-- 分类筛选器 -->
+    <div class="category-filter">
+        <button class="filter-btn active" data-category="all">全部</button>
+        <button class="filter-btn" data-category="动作RPG">动作RPG</button>
+        <button class="filter-btn" data-category="策略游戏">策略游戏</button>
+        <button class="filter-btn" data-category="修真RPG">修真RPG</button>
+    </div>
+    
+    <!-- 搜索框 -->
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="输入游戏名称或类型">
+        <button id="search-button">搜索</button>
+    </div>
+    
+    <!-- 游戏卡片 -->
+    <div class="game-card" data-game="龙域世界" data-category="动作RPG">
+        <div class="game-logo">龙域世界</div>
+        <div class="game-info">
+            <h3>西方玄幻动作RPG</h3>
+            <p><span class="highlight">亮点：</span> 零氪刷BOSS攒钻石，离线挂机自由，每日签到送豪礼</p>
+            <p>全新动作模型+三端互通，超高攻速与爆率设计</p>
+            <div class="rating">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+            </div>
+            <a href="https://lysj.51.com" class="official-link" target="_blank">立即体验</a>
+            <button class="detail-btn" data-game="龙域世界">查看详情</button>
+        </div>
+    </div>
+    
+    <div class="game-card" data-game="51星变" data-category="修真RPG">
+        <div class="game-logo">51星变</div>
+        <div class="game-info">
+            <h3>山海经修真RPG</h3>
+            <p><span class="highlight">亮点：</span> 打怪掉真充值，全图高爆率攻速拉满，支持自由交易</p>
+            <p>千人同屏跨服混战，离线挂机自动收获</p>
+            <div class="rating">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+            </div>
+            <a href="https://s.51.com" class="official-link" target="_blank">立即体验</a>
+            <button class="detail-btn" data-game="51星变">查看详情</button>
+        </div>
+    </div>
+    
+    <div class="game-card" data-game="玄兵骑战" data-category="动作RPG">
+        <div class="game-logo">玄兵骑战</div>
+        <div class="game-info">
+            <h3>大型多人在线RPG</h3>
+            <p><span class="highlight">亮点：</span> 精致唯美场景，终极必爆机制满足打金需求</p>
+            <p>零氪金毕业设计，兼顾休闲与硬核玩家</p>
+            <div class="rating">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+            </div>
+            <a href="https://too.51.com" class="official-link" target="_blank">立即体验</a>
+            <button class="detail-btn" data-game="玄兵骑战">查看详情</button>
+        </div>
+    </div>
+    
+    <div class="game-card" data-game="权游凛冬" data-category="策略游戏">
+        <div class="game-logo">权游凛冬</div>
+        <div class="game-info">
+            <h3>次世代3D战争策略</h3>
+            <p><span class="highlight">亮点：</span> HBO正版授权，还原七国争端，振兴家族</p>
+            <p>创新策略玩法+极致画面，支持大规模跨服战场</p>
+            <div class="rating">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+            </div>
+            <a href="https://hot.yuekenet.com/go-qldyx-0-4-586-438.html" class="official-link" target="_blank">立即体验</a>
+            <button class="detail-btn" data-game="权游凛冬">查看详情</button>
+        </div>
+    </div>
+    
+    <div class="game-card" data-game="漫威秘法狂潮" data-category="动作RPG">
+        <div class="game-logo">漫威秘法狂潮</div>
+        <div class="game-info">
+            <h3>大型多人在线RPG</h3>
+            <p><span class="highlight">亮点：</span> 正版授权，团队战术配合</p>
+            <p>高自由度角色养成，支持跨平台联机</p>
+            <div class="rating">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+            </div>
+            <a href="https://www.ldoooo.com/ldq-template-delivery/pc/landing-page/#/landing/12231" class="official-link" target="_blank">立即体验</a>
+            <button class="detail-btn" data-game="漫威秘法狂潮">查看详情</button>
+        </div>
+    </div>
+    
+    <!-- 详情弹窗 -->
+    <div class="modal" id="detail-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3 id="modal-title"></h3>
+            <p id="modal-description"></p>
+            <p id="modal-features"></p>
+            <a id="modal-link" href="" class="official-link" target="_blank">立即体验</a>
+        </div>
+    </div>
+    
+    <script>
+        // jQuery入口函数（页面加载完成后执行）
+        $(document).ready(function() {
+            // 1. 页面加载动画：body淡入
+            $('body').css('opacity', '1');
+            
+            // 2. 游戏卡片逐个入场动画（延迟加载，更自然）
+            $('.game-card').each(function(index) {
+                let $card = $(this);
+                setTimeout(() => {
+                    $card.addClass('show');
+                }, 100 * index); // 每个卡片延迟100ms入场
+            });
+            
+            // 初始化评分数据
+            const ratings = JSON.parse(localStorage.getItem('ratings') || '{}');
+            
+            // 3. 初始化星级评分
+            $('.star').each(function() {
+                const $star = $(this);
+                const gameName = $star.closest('.game-card').data('game');
+                const rating = ratings[gameName] || 0;
+                highlightStars($star, rating);
+            });
+            
+            // 4. 搜索功能（jQuery简化版）
+            $('#search-button').click(function() {
+                const searchTerm = $('#search-input').val().toLowerCase();
+                $('.game-card').each(function() {
+                    const $card = $(this);
+                    const gameName = $card.data('game').toLowerCase();
+                    const gameType = $card.find('h3').text().toLowerCase();
+                    
+                    if (gameName.includes(searchTerm) || gameType.includes(searchTerm)) {
+                        $card.fadeIn(300); // 淡入动画
+                    } else {
+                        $card.fadeOut(300); // 淡出动画
+                    }
+                });
+            });
+            
+            // 支持回车搜索
+            $('#search-input').keypress(function(e) {
+                if (e.which === 13) {
+                    $('#search-button').click();
+                }
+            });
+            
+            // 5. 分类筛选（jQuery简化版）
+            $('.filter-btn').click(function() {
+                const $btn = $(this);
+                const category = $btn.data('category');
+                
+                // 筛选按钮激活状态
+                $('.filter-btn').removeClass('active');
+                $btn.addClass('active');
+                
+                // 筛选游戏卡片（带过渡动画）
+                $('.game-card').each(function() {
+                    const $card = $(this);
+                    if (category === 'all' || $card.data('category') === category) {
+                        $card.fadeIn(300);
+                    } else {
+                        $card.fadeOut(300);
+                    }
+                });
+            });
+            
+            // 6. 评分功能（jQuery简化版）
+            $('.star').click(function() {
+                const $star = $(this);
+                const rating = $star.data('value');
+                const gameName = $star.closest('.game-card').data('game');
+                
+                // 保存评分到本地存储
+                ratings[gameName] = rating;
+                localStorage.setItem('ratings', JSON.stringify(ratings));
+                
+                // 高亮星星（带动画）
+                highlightStars($star, rating);
+            });
+            
+            // 7. 详情弹窗功能（jQuery简化版）
+            $('.detail-btn').click(function() {
+                const gameName = $(this).data('game');
+                showDetails(gameName);
+            });
+            
+            // 关闭弹窗（点击关闭按钮）
+            $('.close-modal').click(function() {
+                closeModal();
+            });
+            
+            // 点击弹窗外部关闭
+            $('#detail-modal').click(function(e) {
+                if ($(e.target).is('#detail-modal')) {
+                    closeModal();
+                }
+            });
+            
+            // 高亮星星函数
+            function highlightStars($star, rating) {
+                const $stars = $star.parent().find('.star');
+                $stars.each(function() {
+                    const $s = $(this);
+                    $s.toggleClass('highlighted', $s.data('value') <= rating);
+                });
+            }
+            
+            // 显示详情弹窗（带淡入动画）
+            function showDetails(gameName) {
+                const $modal = $('#detail-modal');
+                const gameData = {
+                    '龙域世界': {
+                        title: '龙域世界',
+                        desc: '西方玄幻动作RPG<br>开发商：龙腾游戏 | 发行日期：2025-03-15',
+                        features: '亮点：全新动作模型+三端互通<br>玩家评分：4.8/5',
+                        link: 'https://lysj.51.com'
+                    },
+                    '51星变': {
+                        title: '51星变',
+                        desc: '山海经修真RPG<br>开发商：星变科技 | 发行日期：2025-02-10',
+                        features: '亮点：打怪掉真充值<br>玩家评分：4.6/5',
+                        link: 'https://s.51.com'
+                    },
+                    '玄兵骑战': {
+                        title: '玄兵骑战',
+                        desc: '大型多人在线RPG<br>开发商：玄兵工作室 | 发行日期：2025-01-20',
+                        features: '亮点：精致唯美场景<br>玩家评分：4.7/5',
+                        link: 'https://too.51.com'
+                    },
+                    '权游凛冬': {
+                        title: '权游凛冬',
+                        desc: '次世代3D战争策略<br>开发商：HBO授权 | 发行日期：2025-04-05',
+                        features: '亮点：HBO正版授权<br>玩家评分：4.9/5',
+                        link: 'https://hot.yuekenet.com/go-qldyx-0-4-586-438.html'
+                    },
+                    '漫威秘法狂潮': {
+                        title: '漫威秘法狂潮',
+                        desc: '大型多人在线RPG<br>开发商：漫威娱乐 | 发行日期：2025-03-30',
+                        features: '亮点：正版授权<br>玩家评分：4.5/5',
+                        link: 'https://www.ldoooo.com/ldq-template-delivery/pc/landing-page/#/landing/12231'
+                    }
+                };
+                
+                // 设置弹窗内容
+                $('#modal-title').text(gameData[gameName].title);
+                $('#modal-description').html(gameData[gameName].desc);
+                $('#modal-features').html(gameData[gameName].features);
+                $('#modal-link').attr('href', gameData[gameName].link);
+                
+                // 显示弹窗（带动画）
+                $modal.css('display', 'flex').addClass('show');
+            }
+            
+            // 关闭弹窗（带淡出动画）
+            function closeModal() {
+                const $modal = $('#detail-modal');
+                $modal.removeClass('show');
+                // 等待动画完成后隐藏
+                setTimeout(() => {
+                    $modal.css('display', 'none');
+                }, 300);
+            }
+        });
+    </script>
+</body>
+</html>
